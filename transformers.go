@@ -22,22 +22,22 @@ const (
 // work has been emitted, the Close method is called, ceasing the
 // output.
 type Backend interface {
-	AddAuthor(string)
-	SetTitle(string)
-	EmitWord(string)
-	EndSentence()
-	StartBlockQuote()
-	EndBlockQuote()
-	NewLine()
-	StartParagraph()
-	NewChapter(string)
-	EmitFootnote()
-	StartBold()
-	EndBold()
-	StartItalic()
-	EndItalic()
-	EmitPunctuation(string)
+ 	AddAuthor(string)
 	Close()
+	EmitFootnote()
+	EmitPunctuation(string)
+	EmitWord(string)
+	EndBlockQuote()
+	EndBold()
+	EndItalic()
+	EndSentence()
+	NewChapter(string)
+	NewLine()
+	SetTitle(string)
+	StartBlockQuote()
+	StartBold()
+	StartItalic()
+	StartParagraph()
 }
 
 // A Frontend is a converter of source work data. The work is passed
