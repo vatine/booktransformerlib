@@ -50,7 +50,7 @@ type Frontend interface {
 
 // Generic wrapper for anything that is expected to come from a work.
 type WorkData interface {
-	Emit(Backend)
+	Emit(*Backend)
 }
 
 type Author struct {
@@ -78,15 +78,15 @@ type Word struct {
 	Word string
 }
 
-func (a Author) Emit(b Backend) {
+func (a Author) Emit(b *Backend) {
 	b.AddAuthor(a.Author)
 }
 
-func (c Chapter) Emit(b Backend) {
+func (c Chapter) Emit(b *Backend) {
 	b.NewChapter(c.Name)
 }
 
-func (f Formatting) Emit(b Backend) {
+func (f Formatting) Emit(b *Backend) {
 	switch f.Formatting {
 	case NewLine:
 		b.NewLine()
@@ -111,11 +111,11 @@ func (f Formatting) Emit(b Backend) {
 	}
 }
 
-func (t Title) Emit(b Backend) {
+func (t Title) Emit(b *Backend) {
 	b.SetTitle(t.Title)
 }
 
-func (w Word) Emit(b Backend) {
+func (w Word) Emit(b *Backend) {
 	b.EmitWord(w.Word)
 }
 
@@ -124,7 +124,7 @@ func Convert(f Frontend, b Backend, r io.Reader) {
 	c := f.Parse(r)
 
 	for wd := range c {
-		wd.Emit(b)
+		wd.Emit(&b)
 	}
 
 	b.Close()
