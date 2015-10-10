@@ -15,6 +15,7 @@ const (
 	Strikethrough
 	NewLine
 	BlockQuote
+	Paragraph
 )
 
 // A Backend is a "destination type" (text file, HTML, ePUB, ...) and
@@ -30,7 +31,7 @@ type Backend interface {
 	EndBlockQuote()
 	EndBold()
 	EndItalic()
-	EndSentence()
+	EndParagraph()
 	NewChapter(string)
 	NewLine()
 	SetTitle(string)
@@ -50,7 +51,7 @@ type Frontend interface {
 
 // Generic wrapper for anything that is expected to come from a work.
 type WorkData interface {
-	Emit(*Backend)
+	Emit(Backend)
 }
 
 type Author struct {
@@ -78,15 +79,15 @@ type Word struct {
 	Word string
 }
 
-func (a Author) Emit(b *Backend) {
+func (a Author) Emit(b Backend) {
 	b.AddAuthor(a.Author)
 }
 
-func (c Chapter) Emit(b *Backend) {
+func (c Chapter) Emit(b Backend) {
 	b.NewChapter(c.Name)
 }
 
-func (f Formatting) Emit(b *Backend) {
+func (f Formatting) Emit(b Backend) {
 	switch f.Formatting {
 	case NewLine:
 		b.NewLine()
@@ -108,14 +109,20 @@ func (f Formatting) Emit(b *Backend) {
 		} else {
 			b.EndBold()
 		}
+	case Paragraph:
+		if f.Start {
+			b.StartParagraph()
+		} else {
+			b.EndParagraph()
+		}
 	}
 }
 
-func (t Title) Emit(b *Backend) {
+func (t Title) Emit(b Backend) {
 	b.SetTitle(t.Title)
 }
 
-func (w Word) Emit(b *Backend) {
+func (w Word) Emit(b Backend) {
 	b.EmitWord(w.Word)
 }
 
@@ -124,7 +131,7 @@ func Convert(f Frontend, b Backend, r io.Reader) {
 	c := f.Parse(r)
 
 	for wd := range c {
-		wd.Emit(&b)
+		wd.Emit(b)
 	}
 
 	b.Close()
