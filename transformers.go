@@ -24,7 +24,7 @@ const (
 type Backend interface {
  	AddAuthor(string)
 	Close()
-	EmitFootnote()
+	EmitFootnote(string)
 	EmitPunctuation(string)
 	EmitWord(string)
 	EndBlockQuote()
