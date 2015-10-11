@@ -118,6 +118,10 @@ func (f Formatting) Emit(b Backend) {
 	}
 }
 
+func (p Punctuation) Emit(b Backend) {
+	b.EmitPunctuation(p.Punctuation)
+}
+
 func (t Title) Emit(b Backend) {
 	b.SetTitle(t.Title)
 }

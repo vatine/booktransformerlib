@@ -32,6 +32,10 @@ func (b *HtmlBackend) AddAuthor(author string) {
 }
 
 func (b *HtmlBackend) Close() {
+	if b.inPara {
+		b.EndParagraph()
+	}
+	fmt.Fprintf(b.w, "\n</body>\n</html>\n")
 	b.w.Close()
 }
 
@@ -80,7 +84,7 @@ func (b *HtmlBackend) NewLine() {
 
 func (b *HtmlBackend) NewChapter(title string) {
 	if (b.chapterNo == 0) {
-		fmt.Fprintf(b.w, "<html>\n<head><title>%s</title></head><body><h1>%s</h1>\n", b.title, b.title)
+		fmt.Fprintf(b.w, "<html>\n<head><title>%s</title></head>\n<body><h1>%s</h1>\n", b.title, b.title)
 		for _, a := range b.authors {
 			fmt.Fprintf(b.w, "<center>%s</center>\n", a)
 		}
