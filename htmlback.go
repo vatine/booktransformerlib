@@ -35,6 +35,7 @@ func (b *HtmlBackend) Close() {
 	if b.inPara {
 		b.EndParagraph()
 	}
+	b.writeFootnotes()
 	fmt.Fprintf(b.w, "\n</body>\n</html>\n")
 	b.w.Close()
 }
@@ -47,7 +48,7 @@ func (b *HtmlBackend) EmitFootnote(note string) {
 	b.footnoteNo += 1
 	anchor := b.noteAnchor(b.chapterNo, b.footnoteNo)
 	b.footnotes[anchor] = note
-	fmt.Fprintf(b.w, "<a name=\"notereturn-%s\"><a href=\"note-%s\"><sup>%d</sup></a></a>", anchor, anchor, b.footnoteNo)
+	fmt.Fprintf(b.w, "<a name=\"notereturn-%s\"><a href=\"#note-%s\"><sup>%d</sup></a></a>", anchor, anchor, b.footnoteNo)
 }
 
 func (b *HtmlBackend) EmitPunctuation(p string) {
@@ -82,6 +83,14 @@ func (b *HtmlBackend) NewLine() {
 	fmt.Fprintf(b.w, "<br />\n")
 }
 
+func (b *HtmlBackend) writeFootnotes() {
+	for c := 1; c <= b.footnoteNo; c++ {
+		suffix := b.noteAnchor(b.chapterNo, c)
+		fmt.Fprintf(b.w, "<p><a name=\"note-%s\"><sup>%d</sup></a>%s<small><a href=\"notereturn-%s\">back</a></small></p>\n\n", suffix, c, b.footnotes[suffix], suffix)
+	}
+	b.footnoteNo = 0
+}
+
 func (b *HtmlBackend) NewChapter(title string) {
 	if (b.chapterNo == 0) {
 		fmt.Fprintf(b.w, "<html>\n<head><title>%s</title></head>\n<body><h1>%s</h1>\n", b.title, b.title)
@@ -89,6 +98,7 @@ func (b *HtmlBackend) NewChapter(title string) {
 			fmt.Fprintf(b.w, "<center>%s</center>\n", a)
 		}
 	}
+	b.writeFootnotes()
 	b.chapterNo += 1
 	if b.inPara {
 		b.inPara = false

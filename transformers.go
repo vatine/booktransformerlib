@@ -62,6 +62,10 @@ type Chapter struct {
 	Name string
 }
 
+type Footnote struct {
+	Text string
+}
+
 type Formatting struct {
 	Start      bool
 	Formatting Format
@@ -85,6 +89,10 @@ func (a Author) Emit(b Backend) {
 
 func (c Chapter) Emit(b Backend) {
 	b.NewChapter(c.Name)
+}
+
+func (f Footnote) Emit(b Backend) {
+	b.EmitFootnote(f.Text)
 }
 
 func (f Formatting) Emit(b Backend) {

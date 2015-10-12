@@ -44,6 +44,10 @@ func (f fakeParser) Parse(r io.Reader) <-chan WorkData {
 		}
 		rv <- Punctuation{Punctuation: "."}
 		rv <- Formatting{Start: false, Formatting: Paragraph}
+		rv <- Formatting{Start: true, Formatting: Paragraph}
+		rv <- Word{Word: "blerp"}
+		rv <- Footnote{Text: "This is a test footnote."}
+		rv <- Formatting{Start: false, Formatting: Paragraph}
 		close(rv)
 		
 	} ()
@@ -86,6 +90,10 @@ func TestHtmlBackend(t *testing.T) {
 <h2>1 - This is the chapter that starts. </h2>
 
 <p> This is a word.</p>
+
+<p> blerp<a name="notereturn-c001-n001"><a href="#note-c001-n001"><sup>1</sup></a></a></p>
+
+<p><a name="note-c001-n001"><sup>1</sup></a>This is a test footnote.<small><a href="notereturn-c001-n001">back</a></small></p>
 
 
 </body>
