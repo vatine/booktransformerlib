@@ -1,5 +1,12 @@
-// Copyright 2015- Ingvar Mattsson <imagineaclevernamehere@gmail.com>
-// A Go library for transforming text from one format to another
+// A library for transforming text from one format to another.
+
+// The general principle of operation is that a front-end generates a
+// stream of WorkData items, these are then fed to a backend, where
+// they're emitted in a fashion suitable for whatever format the
+// backend encodes. This library does not create a structured
+// intermediate representation of the work, instead operating on
+// things like "I see an author", "here is a word", "this is a new
+// paragraph", "oh, there's nothing left"...
 package booktransformlib
 
 import (
@@ -20,8 +27,8 @@ const (
 
 // A Backend is a "destination type" (text file, HTML, ePUB, ...) and
 // is actuated by a stream of Blobs from a Frontend. When the whole
-// work has been emitted, the Close method is called, ceasing the
-// output.
+// work has been emitted, the Close method is called, which does
+// assorted cleanup and closes the output stream.
 type Backend interface {
  	AddAuthor(string)
 	Close()
@@ -50,31 +57,41 @@ type Frontend interface {
 }
 
 // Generic wrapper for anything that is expected to come from a work.
+// The Emit function is responsible for passing the relevant data from
+// the frontend to the backend.
 type WorkData interface {
 	Emit(Backend)
 }
 
+// An author. We'd normally expect at least one per work.
 type Author struct {
 	Author string
 }
 
+// This signifies the start of a new chapter. The name is not compulsory,
+// but it is customary.
 type Chapter struct {
 	Name string
 }
 
+// A footnote.
 type Footnote struct {
 	Text string
 }
 
+// This is somewhat of a wrapper type, indicating the start (or end)
+// of a specific type of formatting.
 type Formatting struct {
 	Start      bool
 	Formatting Format
 }
 
+// Punctuation marks.
 type Punctuation struct {
 	Punctuation string
 }
 
+// The title of a work.
 type Title struct {
 	Title string
 }
